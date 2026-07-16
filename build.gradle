@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+// Check https://docs.spring.io/spring-ai/reference/ for the latest stable release
+// and its required Spring Boot version before bumping this.
+ext {
+    set('springAiVersion', '1.1.7')
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Dedicated STDIO MCP server starter: no web dependencies pulled in,
+    // which keeps stdout clean for the JSON-RPC transport.
+    // Do NOT add spring-boot-starter-web here — it fights web-application-type=none
+    // and can corrupt the stdin/stdout JSON-RPC stream.
+    implementation 'org.springframework.ai:spring-ai-starter-mcp-server'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+bootJar {
+    archiveFileName = 'mcp-weather-server.jar'
+}
